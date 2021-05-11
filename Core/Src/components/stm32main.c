@@ -64,6 +64,21 @@ void loop(void) {
 								 */
 					_NOP();
 
+					VREF = caConfiguration.eDC; // Vcell = eDC
+					RELAY = 1; //cerramos el relé
+
+					//Si time == samplingPeriodMs:
+					// Medir Vcell y Icell
+					// Enviar datos al host
+					//time??? timers???
+					//While time < caConfiguration.measurementTime:
+					// Si time == caConfiguration.samplingPeriodMs:
+						// Medir Vcell y Icell ???
+						// Enviar datos al host
+					// if time = caConfiguration.measurementTime:
+						// RELAY = 0; //Abrimos el relé
+
+
 					break;
 
 
