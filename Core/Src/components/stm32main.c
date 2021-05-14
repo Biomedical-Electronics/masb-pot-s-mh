@@ -12,9 +12,14 @@ struct CV_Configuration_S cvConfiguration;
 struct CA_Configuration_S caConfiguration;
 struct Data_S data;
 
+#define EN_Pin				GPIO_PIN_5
+#define EN_GPIO_Port		GPIOA
+
 void setup(struct Handles_S *handles) {
     MASB_COMM_S_setUart(handles->huart);
     MASB_COMM_S_waitForMessage(); //espera al primer byte
+    //encender PMU al principio para alimentar
+    HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 1); //PMU habilitada
 }
 
 void loop(void) {
@@ -62,10 +67,10 @@ void loop(void) {
 								 * Mensaje codificado que enviamos desde CoolTerm (incluye ya el termchar):
 								 * 0B02333333333333D33F0A0101027801010100
 								 */
-					_NOP();
+					__NOP();
 
-					VREF = caConfiguration.eDC; // Vcell = eDC
-					RELAY = 1; //cerramos el relé
+					//VREF = caConfiguration.eDC; // Vcell = eDC
+					//RELAY = 1; //cerramos el relé
 
 					//Si time == samplingPeriodMs:
 					// Medir Vcell y Icell
