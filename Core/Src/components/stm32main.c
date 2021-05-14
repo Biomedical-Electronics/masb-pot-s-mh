@@ -12,10 +12,20 @@ struct CV_Configuration_S cvConfiguration;
 struct CA_Configuration_S caConfiguration;
 struct Data_S data;
 
+#define EN_Pin				GPIO_PIN_5
+#define EN_GPIO_Port		GPIOA
+
 void setup(struct Handles_S *handles) {
+<<<<<<< HEAD
 	EN = 1; //Habilitamos la PMU
 	MASB_COMM_S_setUart(handles->huart);
     MASB_COMM_S_waitForMessage(); //Espera al primer byte
+=======
+    MASB_COMM_S_setUart(handles->huart);
+    MASB_COMM_S_waitForMessage(); //espera al primer byte
+    //encender PMU al principio para alimentar
+    HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 1); //PMU habilitada
+>>>>>>> 91711bded7374047be8190267c041c7d932e8546
 }
 
 void loop(void) {
@@ -38,11 +48,26 @@ void loop(void) {
 
 				case START_CA_MEAS:
 					caConfiguration = MASB_COMM_S_getCaConfiguration();
+<<<<<<< HEAD
 
 					_NOP();
+=======
+					/* Mensaje a enviar desde CoolTerm para hacer comprobacion
+								 * eDC = 0.3 V
+								 * samplingPeriodMs = 10 ms
+								 * measurementTime = 120 s
+								 *
+								 * Mensaje previo a la codificacion (lo que teneis que poder obtener en el microcontrolador):
+								 * 02333333333333D33F0A00000078000000
+								 *
+								 * Mensaje codificado que enviamos desde CoolTerm (incluye ya el termchar):
+								 * 0B02333333333333D33F0A0101027801010100
+								 */
+					__NOP();
+>>>>>>> 91711bded7374047be8190267c041c7d932e8546
 
-					VREF = caConfiguration.eDC; // Vcell = eDC
-					RELAY = 1; //cerramos el relé
+					//VREF = caConfiguration.eDC; // Vcell = eDC
+					//RELAY = 1; //cerramos el relé
 
 					//Si time == samplingPeriodMs:
 					// ADCvalor = Vadc/Vref (2^bits-1) formula sacada de pract 4
