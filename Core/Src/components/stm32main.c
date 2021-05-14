@@ -4,7 +4,9 @@
  *  Created on: May 10, 2021
  *      Author: Helena
  */
-
+#include "components/ad5280_driver.h"
+#include "components/mcp4725_driver.h"
+#include "components/i2c_lib.h"
 #include "components/stm32main.h"
 #include "components/masb_comm_s.h"
 
@@ -16,16 +18,36 @@ struct Data_S data;
 #define EN_GPIO_Port		GPIOA
 
 void setup(struct Handles_S *handles) {
-<<<<<<< HEAD
-	EN = 1; //Habilitamos la PMU
+
 	MASB_COMM_S_setUart(handles->huart);
     MASB_COMM_S_waitForMessage(); //Espera al primer byte
-=======
-    MASB_COMM_S_setUart(handles->huart);
-    MASB_COMM_S_waitForMessage(); //espera al primer byte
-    //encender PMU al principio para alimentar
+
     HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 1); //PMU habilitada
->>>>>>> 91711bded7374047be8190267c041c7d932e8546
+
+    I2C_Init(&hi2c1); // Inicializamos libreria I2C
+
+    // Potenciometro
+
+    AD5280_Handle_T hpot = NULL;
+
+    hpot = AD5280_Init();
+
+    AD5280_ConfigSlaveAddress(hpot, 0x2C);
+    AD5280_ConfigNominalResistorValue(hpot, 50e3f);
+    AD5280_ConfigWriteFunction(hpot, I2C_Write);
+
+    // Fijamos la resistencia de, por ejemplo, 10kohms.
+    AD5280_SetWBResistance(hpot, 10e3f);
+
+    // DAC
+
+   MCP4725_Handle_T hdac = NULL;
+
+   hdac = MCP4725_Init();
+
+   MCP4725_ConfigSlaveAddress(hdac, 0x60); //Dirección I2C en binario 1100000
+   MCP4725_ConfigVoltageReference(hdac, 4.0f);
+   MCP4725_ConfigWriteFunction(hdac, I2C_Write);
 }
 
 void loop(void) {
@@ -48,39 +70,58 @@ void loop(void) {
 
 				case START_CA_MEAS:
 					caConfiguration = MASB_COMM_S_getCaConfiguration();
-<<<<<<< HEAD
+
 
 					_NOP();
-=======
-					/* Mensaje a enviar desde CoolTerm para hacer comprobacion
-								 * eDC = 0.3 V
-								 * samplingPeriodMs = 10 ms
-								 * measurementTime = 120 s
-								 *
-								 * Mensaje previo a la codificacion (lo que teneis que poder obtener en el microcontrolador):
-								 * 02333333333333D33F0A00000078000000
-								 *
-								 * Mensaje codificado que enviamos desde CoolTerm (incluye ya el termchar):
-								 * 0B02333333333333D33F0A0101027801010100
-								 */
-					__NOP();
->>>>>>> 91711bded7374047be8190267c041c7d932e8546
 
-					//VREF = caConfiguration.eDC; // Vcell = eDC
-					//RELAY = 1; //cerramos el relé
 
-					//Si time == samplingPeriodMs:
-					// ADCvalor = Vadc/Vref (2^bits-1) formula sacada de pract 4
-					// Medir Vcell y Icell
+					// Fijar Vcell = eDC
 
-					// data.point = Numero de la muestra
-					// data.timeMs = lo sacamos del timer
-					// data.voltage = (1.65 - Vadc)*2
-					// data.current = (Vadc - 1.65)*2/10000 //RTIA de 10kOhms
+					float VDAC;
+					VDAC = 1.65 - (caConfiguration.eDC)/2; // VDAC = 1.65 - VCELL/2
+					MCP4725_SetOutputVoltage(hdac, VDAC); // En vez de 0.0f metemos VDAC
+
+
+					//Cerramos el relé
+
+					HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_PIN, 1);
+
+					HAL_TIM_Base_Start_IT(&htim3); //Iniciar el funcionamiento del timer con interrupciones
+						// Este código va aquí???
+
+
+					// El siguiente código iria en el main.c?? /USER CODE BEGIN 4/
+					int contador = 0;
+
+					void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+
+						//Si time == samplingPeriodMs:
+							// ADCvalor = Vadc/Vref (2^bits-1)
+						// Cómo leemos ADCvalor?
+						// VREF es el valor del pin REF? En que momento fijamos este valor VREF?
+						// Y los bits??
+
+							// Medir Vcell y Icell
+
+							// data.point = Numero de la muestra
+						// PONEMOS EL VALOR DE LA VARIABLE contador??
+							// data.timeMs = lo sacamos del timer
+						//COMO ESCRIBIMOS EL TIEMPO DEL TIMER???
+							// data.voltage = (1.65 - Vadc)*2
+							// data.current = (Vadc - 1.65)*2/10000 //RTIA de 10kOhms
+							contador = contador + 1;
+							if (contador == caConfiguration.measurementTime){
+								HAL_TIM_Base_Stop_IT(&htim3);
+								HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_PIN, 0);
+							}
+
+					}
+
+					// Preguntamos si el measurement time entra bien en esta funcion.
+
 
 					// Enviar datos al host
-					//MASB_COMM_S_sendData(data);
-
+					MASB_COMM_S_sendData(data);
 
 
 					//While time < caConfiguration.measurementTime:
@@ -90,9 +131,6 @@ void loop(void) {
 					// if time = caConfiguration.measurementTime:
 						// RELAY = 0; //Abrimos el relé
 
-					//Utilizamos interrupciones: haremos una interrupcion para smpling time
-					// si por ejemplo sampling es 1 seg y measurement es 10, cuando hayan pasado 11 sampling salimos del bucle
-					//EN EL TIMER TENDRE QUE METER UN HAL_..._SET PERIOD CON EL PERIODOSAMPLING QUE HEMOS LEÍDO DEL CA CONFIGURATION
 
 					break;
 
