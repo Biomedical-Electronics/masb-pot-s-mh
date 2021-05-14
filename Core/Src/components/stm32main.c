@@ -13,8 +13,9 @@ struct CA_Configuration_S caConfiguration;
 struct Data_S data;
 
 void setup(struct Handles_S *handles) {
-    MASB_COMM_S_setUart(handles->huart);
-    MASB_COMM_S_waitForMessage(); //espera al primer byte
+	EN = 1; //Habilitamos la PMU
+	MASB_COMM_S_setUart(handles->huart);
+    MASB_COMM_S_waitForMessage(); //Espera al primer byte
 }
 
 void loop(void) {
@@ -28,20 +29,6 @@ void loop(void) {
 	                // la guardamos en la variable cvConfiguration
 					cvConfiguration = MASB_COMM_S_getCvConfiguration();
 
- 				/* Mensaje a enviar desde CoolTerm para hacer comprobacion
-	+				 * eBegin = 0.25 V
-	+ 				 * eVertex1 = 0.5 V
-	+ 				 * eVertex2 = -0.5 V
-	+ 				 * cycles = 2
-	+ 				 * scanRate = 0.01 V/s
-	+ 				 * eStep = 0.005 V
-	+ 				 *
-	+ 				 * Mensaje previo a la codificacion (lo que teneis que poder obtener en el microcontrolador):
-	+ 				 * 01000000000000D03F000000000000E03F000000000000E0BF027B14AE47E17A843F7B14AE47E17A743F
-	+ 				 *
-	+ 				 * Mensaje codificado que enviamos desde CoolTerm (incluye ya el termchar):
-	+ 				 * 0201010101010103D03F010101010103E03F010101010114E0BF027B14AE47E17A843F7B14AE47E17A743F00
-	+ 				 */
 	 				__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
 
 	 				// Aqui iria todo el codigo de gestion de la medicion que hareis en el proyecto
@@ -51,26 +38,26 @@ void loop(void) {
 
 				case START_CA_MEAS:
 					caConfiguration = MASB_COMM_S_getCaConfiguration();
-					/* Mensaje a enviar desde CoolTerm para hacer comprobacion
-								 * eDC = 0.3 V
-								 * samplingPeriodMs = 10 ms
-								 * measurementTime = 120 s
-								 *
-								 * Mensaje previo a la codificacion (lo que teneis que poder obtener en el microcontrolador):
-								 * 02333333333333D33F0A00000078000000
-								 *
-								 * Mensaje codificado que enviamos desde CoolTerm (incluye ya el termchar):
-								 * 0B02333333333333D33F0A0101027801010100
-								 */
+
 					_NOP();
 
 					VREF = caConfiguration.eDC; // Vcell = eDC
 					RELAY = 1; //cerramos el relé
 
 					//Si time == samplingPeriodMs:
+					// ADCvalor = Vadc/Vref (2^bits-1) formula sacada de pract 4
 					// Medir Vcell y Icell
+
+					// data.point = Numero de la muestra
+					// data.timeMs = lo sacamos del timer
+					// data.voltage = (1.65 - Vadc)*2
+					// data.current = (Vadc - 1.65)*2/10000 //RTIA de 10kOhms
+
 					// Enviar datos al host
-					//time??? timers???
+					//MASB_COMM_S_sendData(data);
+
+
+
 					//While time < caConfiguration.measurementTime:
 					// Si time == caConfiguration.samplingPeriodMs:
 						// Medir Vcell y Icell ???
@@ -78,6 +65,9 @@ void loop(void) {
 					// if time = caConfiguration.measurementTime:
 						// RELAY = 0; //Abrimos el relé
 
+					//Utilizamos interrupciones: haremos una interrupcion para smpling time
+					// si por ejemplo sampling es 1 seg y measurement es 10, cuando hayan pasado 11 sampling salimos del bucle
+					//EN EL TIMER TENDRE QUE METER UN HAL_..._SET PERIOD CON EL PERIODOSAMPLING QUE HEMOS LEÍDO DEL CA CONFIGURATION
 
 					break;
 
