@@ -58,10 +58,29 @@ void loop(void) {
 	                // la guardamos en la variable cvConfiguration
 					cvConfiguration = MASB_COMM_S_getCvConfiguration();
 
+					// Fijar VCELL a eBegin
+
+					float VDAC;
+					double vObjetivo;
+
+					VDAC = 1.65 - (cvConfiguration.eBegin)/2; // VDAC = 1.65 - VCELL/2
+					MCP4725_SetOutputVoltage(hdac, VDAC); // En vez de 0.0f metemos VDAC
+
+					vObjetivo = cvConfiguration.eVertex1;
+
+					//Cerramos el relé
+
+					HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, 1);
+
+					double period = (cvConfiguration.eStep/cvConfiguration.scanRate)*1000; //periodo en ms
+
+					__HAL_TIM_SET_AUTORELOAD(&htim3, period * 10);
+
+					HAL_TIM_Base_Start_IT(&htim3); //Iniciar el funcionamiento del timer con interrupciones
+
+
 	 				__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
 
-	 				// Aqui iria todo el codigo de gestion de la medicion que hareis en el proyecto
-	                // si no quereis implementar el comando de stop.
 
 	 				break;
 
@@ -84,6 +103,7 @@ void loop(void) {
 
 					HAL_TIM_Base_Start_IT(&htim3); //Iniciar el funcionamiento del timer con interrupciones
 
+					// Hay que poner algun HAL_delay???
 
 					break;
 
@@ -121,40 +141,96 @@ void loop(void) {
 }
 
 
+float cyclesCA = (caConfiguration.measurementTime*1000)/caConfiguration.samplingPeriodMs; //pasamos Measurement time a ms
+int contadorCA = (int)cyclesCA + 1;  // MEASUREMENT/SAMPLING + 1 Y REDONDEAMOS HACIA ABAJO
+int i = 0;
 
-int contador = 0;
 uint32_t ADCval_Vcell = 0;
 uint32_t ADCval_Icell = 0;
+double Vadc;
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim3) {
 
-	// ADCvalor = Vadc/Vref (2^bits-1).
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
-	ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
+	case START_CV_MEAS:
+		// ADCvalor = Vadc/Vref (2^bits-1).
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
+		ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-	Vadc = ADCval * 3.3 / (2^12 -1); //12 bits, Vref es 3.3V
+		Vadc = ADCval_Vcell * 3.3/(2^12 -1); //12 bits, Vref es 3.3V
 
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
-	ADCval_Icell = HAL_ADC_GetValue(&hadc1);
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
+		ADCval_Icell = HAL_ADC_GetValue(&hadc1);
 
+		i = i + 1;
 
-		// Medir Vcell y Icell
+		data.point = i; //Numero de la muestra
+		data.timeMs = __HAL_TIM_GetCounter(&htim3); //tiempo del timer
+		data.voltage = (1.65 - Vadc)*2;
+		data.current = (Vadc - 1.65)*2/10000; //RTIA de 10kOhms
 
-	data.point = 1; //Numero de la muestra // PONEMOS EL VALOR DE LA VARIABLE contador??
-	data.timeMs = 100; //Lo sacamos del timer //COMO ESCRIBIMOS EL TIEMPO DEL TIMER???
-	data.voltage = (1.65 - Vadc)*2;
-	data.current = (Vadc - 1.65)*2/10000; //RTIA de 10kOhms
+					// Enviar datos al host
+		MASB_COMM_S_sendData(data);
 
-	// Enviar datos al host
-	MASB_COMM_S_sendData(data);
-
-
-		contador = contador + 1; // MEASUREMENT/SAMPLING + 1 Y REDONDEAMOS
-		if (!contador){ //Cuando el contador llegue a cero se ejecutará lo de dentro.
-			HAL_TIM_Base_Stop_IT(&htim3);
-			HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_PIN, 0);
+		while (data.voltage == vObjetivo){
+			if (vObjetivo == cvConfiguration.eVertex1){
+				vObjetivo = cvConfiguration.eVertex2;
+			} else if (vObjetivo == cvConfiguration.eVertex2){
+				vObjetivo = cvConfiguration.eBegin;
+			} else if (!cycles){ //si es el ultimo
+				HAL_TIM_Base_Stop_IT(&htim3);
+				HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_PIN, 0);
+				break;
+			} else{
+				vObjetivo = cvConfiguration.eVertex1;
+			}
 		}
+
+		if (data.voltage != vObjetivo){
+			if (data.voltage + cvConfiguration.eStep > vObjetivo){
+				float VDAC;
+				VDAC = 1.65 - (vObjetivo)/2; // VDAC = 1.65 - VCELL/2
+				MCP4725_SetOutputVoltage(hdac, VDAC);
+			} else {
+				data.voltage = data.voltage - cvConfiguration.eStep;
+			}
+		}
+
+		//Cuando restamos ciclos?
+
+	case START_CA_MEAS:
+
+		if (!contadorCA){ //Cuando el contador llegue a cero se ejecutará lo de dentro.
+				HAL_TIM_Base_Stop_IT(&htim3);
+				HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_PIN, 0);
+		} else{
+
+			// Medir Vcell y Icell
+
+			// ADCvalor = Vadc/Vref (2^bits-1).
+			HAL_ADC_Start(&hadc1);
+			HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
+			ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
+
+			Vadc = ADCval_Vcell * 3.3/(2^12 -1); //12 bits, Vref es 3.3V
+
+			HAL_ADC_Start(&hadc1);
+			HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
+			ADCval_Icell = HAL_ADC_GetValue(&hadc1);
+
+			i = i + 1;
+
+			data.point = i; //Numero de la muestra
+			data.timeMs = __HAL_TIM_GetCounter(&htim3); //tiempo del timer
+			data.voltage = (1.65 - Vadc)*2;
+			data.current = (Vadc - 1.65)*2/10000; //RTIA de 10kOhms
+
+			// Enviar datos al host
+			MASB_COMM_S_sendData(data);
+
+			contadorCA = contadorCA - 1;
+		}
+	break;
 
 }

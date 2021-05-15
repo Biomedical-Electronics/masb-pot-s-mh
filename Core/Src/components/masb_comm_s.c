@@ -11,8 +11,13 @@
 
 #include "components/masb_comm_s.h"
 #include "components/cobs.h"
+#include "main.h"
 
+extern ADC_HandleTypeDef hadc1;
+extern I2C_HandleTypeDef hi2c1;
+extern TIM_HandleTypeDef htim3;
 extern UART_HandleTypeDef huart2;
+
 
 uint8_t rxBuffer[UART_BUFF_SIZE] = { 0 },
 		txBuffer[UART_BUFF_SIZE] = { 0 };
