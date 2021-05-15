@@ -75,6 +75,7 @@ void loop(void) {
 					double period = (cvConfiguration.eStep/cvConfiguration.scanRate)*1000; //periodo en ms
 
 					__HAL_TIM_SET_AUTORELOAD(&htim3, period * 10);
+					__HAL_TIM_SET_COUNTER(&htim3, 0); //Reiniciamos el contador del timer a cero
 
 					HAL_TIM_Base_Start_IT(&htim3); //Iniciar el funcionamiento del timer con interrupciones
 
@@ -100,6 +101,7 @@ void loop(void) {
 
 					HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, 1);
 					__HAL_TIM_SET_AUTORELOAD(&htim3, caConfiguration.samplingPeriodMs * 10);
+					__HAL_TIM_SET_COUNTER(&htim3, 0);
 
 					HAL_TIM_Base_Start_IT(&htim3); //Iniciar el funcionamiento del timer con interrupciones
 
@@ -173,11 +175,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim3) {
 					// Enviar datos al host
 		MASB_COMM_S_sendData(data);
 
+		cycles = cvConfiguration.cycles - 1; //le resto uno a cycles?????
+
 		while (data.voltage == vObjetivo){
 			if (vObjetivo == cvConfiguration.eVertex1){
 				vObjetivo = cvConfiguration.eVertex2;
 			} else if (vObjetivo == cvConfiguration.eVertex2){
 				vObjetivo = cvConfiguration.eBegin;
+				cycles = cycles - 1; //Ha transcurrido un ciclo
 			} else if (!cycles){ //si es el ultimo
 				HAL_TIM_Base_Stop_IT(&htim3);
 				HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_PIN, 0);
@@ -197,7 +202,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim3) {
 			}
 		}
 
-		//Cuando restamos ciclos?
+		//VCELL es data.voltage?????????
 
 	case START_CA_MEAS:
 
