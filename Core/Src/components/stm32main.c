@@ -22,8 +22,7 @@ extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim3;
 extern UART_HandleTypeDef huart2;
 
-_Bool Get_CAMeasure = FALSE;
-_Bool Get_CVMeasure = FALSE;
+_Bool Get_Measure = FALSE;
 
 float VDAC;
 uint32_t ADCval_Vcell = 0;
@@ -80,74 +79,83 @@ void loop(void) {
 				MCP4725_SetOutputVoltage(hdac, VDAC); // En vez de 0.0f metemos VDAC
 
 				vObjetivo = cvConfiguration.eVertex1;
-				double Vcell = cvConfiguration.eVertex1;
+				double Vcell = cvConfiguration.eBegin;
+				double eStep = cvConfiguration.eStep;
 
 				//Cerramos el relé
 
 				HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_SET);
 
-				double period = (cvConfiguration.eStep / cvConfiguration.scanRate)* 1000; //periodo en ms
+				uint32_t period =(uint32_t)((cvConfiguration.eStep / cvConfiguration.scanRate) * 1000.0 + 0.5); //periodo en ms
 
 				__HAL_TIM_SET_AUTORELOAD(&htim3, period * 10);
 				__HAL_TIM_SET_COUNTER(&htim3, 0); //Reiniciamos el contador del timer a cero
 
 				HAL_TIM_Base_Start_IT(&htim3); //Iniciar el funcionamiento del timer con interrupciones
 
-				double counter = 0;
-				int i = 0;
+				uint32_t counter = 0;
+				int i = 1;
 
-				Get_CVMeasure = FALSE;
+				Get_Measure = FALSE;
+				uint8_t cycles = 0;
+				while (cycles < cvConfiguration.cycles) {
 
-				while (counter <= cvConfiguration.cycles) {
-
-					if (Get_CVMeasure){
+					if (Get_Measure){
 
 						// ADCvalor = Vadc/Vref (2^bits-1).
 						HAL_ADC_Start(&hadc1);
 						HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 						ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-						Vadc1 = ADCval_Vcell * 3.3 / (2 ^ 12 - 1); //12 bits, Vref es 3.3V
+						Vadc1 = ADCval_Vcell * 3.3 / 4095; //12 bits, Vref es 3.3V
 
 						HAL_ADC_Start(&hadc1);
 						HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 						ADCval_Icell = HAL_ADC_GetValue(&hadc1);
-						Vadc2 = ADCval_Icell * 3.3 / (2 ^ 12 - 1);
+						Vadc2 = ADCval_Icell * 3.3 / 4095;
 
 						data.point = i; //Numero de la muestra
-						data.timeMs = __HAL_TIM_GetCounter(&htim3); //tiempo del timer
-						data.voltage = (1.65 - Vadc1) * 2;
+						data.timeMs = counter; //tiempo del timer
+						//data.voltage = (1.65 - Vadc1) * 2;
+						data.voltage = Vcell;
 						data.current = (Vadc2 - 1.65) * 2 / 10000; //RTIA de 10kOhms
 
 						// Enviar datos al host
 						MASB_COMM_S_sendData(data);
 
+
+						counter += period;
 						i++;
-						Get_CVMeasure = FALSE;
+						Get_Measure = FALSE;
 
 						if (Vcell == vObjetivo) { //YO PONDRIA UN WHILE
 							if (vObjetivo == cvConfiguration.eVertex1) {
 								vObjetivo = cvConfiguration.eVertex2;
+								eStep = -cvConfiguration.eStep;
 
 							} else if (vObjetivo == cvConfiguration.eVertex2) {
 								vObjetivo = cvConfiguration.eBegin;
-								counter = counter + 1; //Ha transcurrido un ciclo
+								eStep = cvConfiguration.eStep;
+								cycles++; //Ha transcurrido un ciclo
 
-							} else if (counter == cvConfiguration.cycles) { //si es el ultimo
+							} else if (cycles == cvConfiguration.cycles) { //si es el ultimo
 								break;
 
 							} else {
 								vObjetivo = cvConfiguration.eVertex1;
+								eStep = cvConfiguration.eStep;
 							}
 
 						} else {
 
 							if ((Vcell + cvConfiguration.eStep) > vObjetivo) {
-								VDAC = 1.65 - (vObjetivo / 2); // VDAC = 1.65 - VCELL/2
-								MCP4725_SetOutputVoltage(hdac, VDAC);
+								Vcell = vObjetivo;
 							} else {
-								Vcell = Vcell - cvConfiguration.eStep;
+								Vcell = Vcell + eStep;
 							}
+
+							VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
+							MCP4725_SetOutputVoltage(hdac, VDAC);
 
 
 						}
@@ -177,8 +185,8 @@ void loop(void) {
 
 				HAL_TIM_Base_Start_IT(&htim3); //Iniciar el funcionamiento del timer con interrupciones
 
-				double time = 0;
-				i = 0;
+				uint32_t time = 0;
+				i = 1;
 
 				// Medir Vcell y Icell
 
@@ -187,16 +195,16 @@ void loop(void) {
 				HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 				ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-				Vadc1 = ADCval_Vcell * 3.3 / (2^12 - 1); //12 bits, Vref es 3.3V
+				Vadc1 = ADCval_Vcell * 3.3 / 4095; //12 bits, Vref es 3.3V
 
 				HAL_ADC_Start(&hadc1);
 				HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 				ADCval_Icell = HAL_ADC_GetValue(&hadc1);
 
-				Vadc2 = ADCval_Icell * 3.3 / (2^12 - 1);
+				Vadc2 = ADCval_Icell * 3.3 / 4095;
 
 				data.point = i; //Numero de la muestra
-				data.timeMs = caConfiguration.samplingPeriodMs * i; //tiempo del timer
+				data.timeMs = time; //tiempo del timer
 				data.voltage = (1.65 - Vadc1) * 2;
 				data.current = (Vadc2 - 1.65) * 2 / 10000; //RTIA de 10kOhms
 
@@ -207,10 +215,10 @@ void loop(void) {
 				i++;
 
 
-				Get_CAMeasure = FALSE;
+				Get_Measure = FALSE;
 
 				while (time <= caConfiguration.measurementTime * 1000) { //Measurement time en ms
-					if (Get_CAMeasure) {
+					if (Get_Measure) {
 
 						// Medir Vcell y Icell
 
@@ -219,24 +227,24 @@ void loop(void) {
 							HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 							ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-							Vadc1 = ADCval_Vcell * 3.3 / (2^12 - 1); //12 bits, Vref es 3.3V
+							Vadc1 = ADCval_Vcell * 3.3 / 4095; //12 bits, Vref es 3.3V
 
 							HAL_ADC_Start(&hadc1);
 							HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 							ADCval_Icell = HAL_ADC_GetValue(&hadc1);
 
-							Vadc2 = ADCval_Icell * 3.3 / (2^12 - 1); //12 bits, Vref es 3.3V
+							Vadc2 = ADCval_Icell * 3.3 / 4095; //12 bits, Vref es 3.3V
 
 
 							data.point = i; //Numero de la muestra
-							data.timeMs = caConfiguration.samplingPeriodMs * i; //tiempo del timer
+							data.timeMs = time; //tiempo del timer
 							data.voltage = (1.65 - Vadc1) * 2;
 							data.current = (Vadc2 - 1.65) * 2 / 10000; //RTIA de 10kOhms
 
 							// Enviar datos al host
 							MASB_COMM_S_sendData(data);
 
-							Get_CAMeasure = FALSE;
+							Get_Measure = FALSE;
 							time = time + caConfiguration.samplingPeriodMs;
 							i++;
 					}
@@ -264,18 +272,7 @@ void loop(void) {
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	switch (MASB_COMM_S_command()) {
 
-		case START_CV_MEAS:
-			Get_CVMeasure = TRUE;
-
-			break;
-
-		case START_CA_MEAS:
-
-			Get_CAMeasure = TRUE;
-
-			break;
-	}
+	Get_Measure = TRUE;
 
 }
