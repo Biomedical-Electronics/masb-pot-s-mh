@@ -98,6 +98,7 @@ void loop(void) {
 
 				Get_Measure = FALSE;
 				uint8_t cycles = 0;
+
 				while (cycles < cvConfiguration.cycles) {
 
 					if (Get_Measure){
@@ -128,7 +129,7 @@ void loop(void) {
 						i++;
 						Get_Measure = FALSE;
 
-						if (Vcell == vObjetivo) { //YO PONDRIA UN WHILE
+						if (Vcell == vObjetivo) {
 							if (vObjetivo == cvConfiguration.eVertex1) {
 								vObjetivo = cvConfiguration.eVertex2;
 								eStep = -cvConfiguration.eStep;
@@ -147,17 +148,29 @@ void loop(void) {
 							}
 
 						} else {
+							if (vObjetivo == cvConfiguration.eVertex1){
 
-							if ((Vcell + cvConfiguration.eStep) > vObjetivo) {
-								Vcell = vObjetivo;
-							} else {
-								Vcell = Vcell + eStep;
+								if ((Vcell + cvConfiguration.eStep) > vObjetivo) {
+									Vcell = vObjetivo;
+								} else {
+									Vcell = Vcell + eStep;
+								}
+
+								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
+								MCP4725_SetOutputVoltage(hdac, VDAC);
+
+							} else if (vObjetivo == cvConfiguration.eVertex2){
+
+								if ((Vcell + cvConfiguration.eStep) < vObjetivo) {
+									Vcell = vObjetivo;
+								} else {
+									Vcell = Vcell + eStep;
+								}
+
+								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
+								MCP4725_SetOutputVoltage(hdac, VDAC);
+
 							}
-
-							VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
-							MCP4725_SetOutputVoltage(hdac, VDAC);
-
-
 						}
 
 
