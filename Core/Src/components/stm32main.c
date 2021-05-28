@@ -137,14 +137,14 @@ void loop(void) {
 							} else if (vObjetivo == cvConfiguration.eVertex2) {
 								vObjetivo = cvConfiguration.eBegin;
 								eStep = cvConfiguration.eStep;
-								cycles++; //Ha transcurrido un ciclo
 
-							} else if (cycles == cvConfiguration.cycles) { //si es el ultimo
+							} else if ((cycles-1) == cvConfiguration.cycles) { //si es el ultimo
 								break;
 
 							} else {
 								vObjetivo = cvConfiguration.eVertex1;
 								eStep = cvConfiguration.eStep;
+								cycles++; //Ha transcurrido un ciclo
 							}
 
 						} else {
@@ -162,6 +162,17 @@ void loop(void) {
 							} else if (vObjetivo == cvConfiguration.eVertex2){
 
 								if ((Vcell + cvConfiguration.eStep) < vObjetivo) {
+									Vcell = vObjetivo;
+								} else {
+									Vcell = Vcell + eStep;
+								}
+
+								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
+								MCP4725_SetOutputVoltage(hdac, VDAC);
+
+							} else if (vObjetivo == cvConfiguration.eBegin){
+
+								if ((Vcell + cvConfiguration.eStep) > vObjetivo) {
 									Vcell = vObjetivo;
 								} else {
 									Vcell = Vcell + eStep;
