@@ -36,7 +36,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define TRUE		1
+#define FALSE		0
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -103,6 +104,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   struct Handles_S myHandles;
   myHandles.huart = &huart2;
+  myHandles.hi2c1 = &hi2c1;
+  myHandles.htim3 = &htim3;
+  myHandles.hadc1 = &hadc1;
 
   setup(&myHandles);
 

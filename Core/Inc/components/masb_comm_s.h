@@ -19,18 +19,20 @@
 #define UART_BUFF_SIZE		50
 #define UART_TERM_CHAR		0x00
 
-#define START_CV_MEAS		0x01
-#define START_CA_MEAS		0x02
-#define STOP_MEAS			0x03
+#define TRUE					1
+#define FALSE					0
 
-#ifndef TRUE
-    #define TRUE				1
-#endif
+// Commands
+#define START_CV_MEAS	0x01
+#define START_CA_MEAS	0x02
+#define STOP_MEAS		0x03
 
-#ifndef FALSE
-    #define FALSE				0
-#endif
+#include "stm32f4xx_hal.h"
+#include "components/cobs.h"
+#include "components/cyclic_voltammetry.h"
+#include "components/chronoamperometry.h"
 
+// Structures
 struct Data_S {
 
 	uint32_t point;
@@ -41,11 +43,18 @@ struct Data_S {
 };
 
 // Prototypes.
+void MASB_COMM_S_setUart(UART_HandleTypeDef *newHuart);
+void MASB_COMM_S_setADC(ADC_HandleTypeDef *newHuart);
+void MASB_COMM_S_setTIM(TIM_HandleTypeDef *newHuart);
+void MASB_COMM_S_setI2C(I2C_HandleTypeDef *newHuart);
+
 void MASB_COMM_S_waitForMessage(void);
 _Bool MASB_COMM_S_dataReceived(void);
 uint8_t MASB_COMM_S_command(void);
+
 struct CV_Configuration_S MASB_COMM_S_getCvConfiguration(void);
-void MASB_COMM_S_sendData(struct Data_S data);
 struct CA_Configuration_S MASB_COMM_S_getCaConfiguration(void);
+void MASB_COMM_S_sendData(struct Data_S data);
+
 
 #endif /* INC_COMPONENTS_MASB_COMM_S_H_ */
