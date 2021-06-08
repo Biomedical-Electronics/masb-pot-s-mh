@@ -30,7 +30,7 @@ uint32_t ADCval_Icell = 0;
 double Vadc, Vadc1, Vadc2;
 float output;
 
-static double rTia = 0;
+static double rTia = 50e3;
 const double u2b_m = 8.0 / 3.3;
 const double u2b_b = 4.0;
 
@@ -81,8 +81,7 @@ void loop(void) {
 
 				double vObjetivo;
 
-				VDAC = 1.65 - (cvConfiguration.eBegin / 2); // VDAC = 1.65 - VCELL/2
-				output = VDAC/2.0 + 2.0;
+				output = cvConfiguration.eBegin/2.0 + 2.0;
 				MCP4725_SetOutputVoltage(hdac, output); // En vez de 0.0f metemos VDAC
 
 				vObjetivo = cvConfiguration.eVertex1;
@@ -166,8 +165,7 @@ void loop(void) {
 									Vcell = Vcell + eStep;
 								}
 
-								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
-								output = VDAC/2.0 + 2.0;
+								output = Vcell/2.0 + 2.0;
 								MCP4725_SetOutputVoltage(hdac, output);
 
 							} else if (vObjetivo == cvConfiguration.eVertex2){
@@ -178,8 +176,7 @@ void loop(void) {
 									Vcell = Vcell + eStep;
 								}
 
-								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
-								output = VDAC/2.0 + 2.0;
+								output = Vcell/2.0 + 2.0;
 								MCP4725_SetOutputVoltage(hdac, output);
 
 							} else if (vObjetivo == cvConfiguration.eBegin){
@@ -190,8 +187,7 @@ void loop(void) {
 									Vcell = Vcell + eStep;
 								}
 
-								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
-								output = VDAC/2.0 + 2.0;
+								output = Vcell/2.0 + 2.0;
 								MCP4725_SetOutputVoltage(hdac, output);
 
 							}
@@ -212,8 +208,7 @@ void loop(void) {
 				caConfiguration = MASB_COMM_S_getCaConfiguration();
 
 				// Fijar Vcell = eDC
-				VDAC = 1.65 - (caConfiguration.eDC / 2); // VDAC = 1.65 - VCELL/2
-				output = VDAC/2.0 + 2.0;
+				output = caConfiguration.eDC/2.0 + 2.0;
 				MCP4725_SetOutputVoltage(hdac, output); // En vez de 0.0f metemos VDAC
 
 				//Cerramos el relé
@@ -234,7 +229,7 @@ void loop(void) {
 				HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 				ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-				Vadc1 = (double)ADCval_Vcell * 3.3 / 4095.0; //12 bits, Vref es 3.3V
+				Vadc1 = ((double)ADCval_Vcell) * 3.3 / 4095.0; //12 bits, Vref es 3.3V
 
 				HAL_ADC_Start(&hadc1);
 				HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
@@ -266,7 +261,7 @@ void loop(void) {
 							HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 							ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-							Vadc1 = (double)ADCval_Vcell * 3.3 / 4095.0; //12 bits, Vref es 3.3V
+							Vadc1 = ((double)ADCval_Vcell) * 3.3 / 4095.0; //12 bits, Vref es 3.3V
 
 							HAL_ADC_Start(&hadc1);
 							HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
