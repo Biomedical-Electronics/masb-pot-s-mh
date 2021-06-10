@@ -28,6 +28,11 @@ float VDAC;
 uint32_t ADCval_Vcell = 0;
 uint32_t ADCval_Icell = 0;
 double Vadc, Vadc1, Vadc2;
+float output;
+
+static double rTia = 50e3;
+const double u2b_m = 8.0 / 3.3;
+const double u2b_b = 4.0;
 
 void setup(struct Handles_S *handles) {
 
@@ -37,6 +42,7 @@ void setup(struct Handles_S *handles) {
 	MASB_COMM_S_waitForMessage(); //Espera al primer byte
 
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 1); //PMU habilitada
+	HAL_Delay(500);
 
 	I2C_Init(handles->hi2c1); // Inicializamos libreria I2C
 
@@ -49,7 +55,7 @@ void setup(struct Handles_S *handles) {
 	AD5280_ConfigWriteFunction(hpot, I2C_Write);
 
 	// Fijamos la resistencia de, por ejemplo, 12kohms.
-	AD5280_SetWBResistance(hpot, 12e3f);
+	AD5280_SetWBResistance(hpot, 50e3f);
 
 	// DAC
 
@@ -75,8 +81,8 @@ void loop(void) {
 
 				double vObjetivo;
 
-				VDAC = 1.65 - (cvConfiguration.eBegin / 2); // VDAC = 1.65 - VCELL/2
-				MCP4725_SetOutputVoltage(hdac, VDAC); // En vez de 0.0f metemos VDAC
+				output = cvConfiguration.eBegin/2.0 + 2.0;
+				MCP4725_SetOutputVoltage(hdac, output); // En vez de 0.0f metemos VDAC
 
 				vObjetivo = cvConfiguration.eVertex1;
 				double Vcell = cvConfiguration.eBegin;
@@ -108,18 +114,20 @@ void loop(void) {
 						HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 						ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-						Vadc1 = ADCval_Vcell * 3.3 / 4095; //12 bits, Vref es 3.3V
+						Vadc1 = (double)ADCval_Vcell * 3.3 / 4095.0; //12 bits, Vref es 3.3V
+						Vadc1 = -((Vadc1 * u2b_m) - u2b_b);
 
 						HAL_ADC_Start(&hadc1);
 						HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 						ADCval_Icell = HAL_ADC_GetValue(&hadc1);
-						Vadc2 = ADCval_Icell * 3.3 / 4095;
+
+						Vadc2 = ((double)ADCval_Icell) * 3.3 / 4095.0;
 
 						data.point = i; //Numero de la muestra
 						data.timeMs = counter; //tiempo del timer
 						//data.voltage = (1.65 - Vadc1) * 2;
 						data.voltage = Vcell;
-						data.current = (Vadc2 - 1.65) * 2 / 10000; //RTIA de 10kOhms
+						data.current = ((Vadc2*u2b_m)-u2b_b)/rTia; //RTIA de 10kOhms
 
 						// Enviar datos al host
 						MASB_COMM_S_sendData(data);
@@ -139,6 +147,7 @@ void loop(void) {
 								eStep = cvConfiguration.eStep;
 
 							} else if ((cycles-1) == cvConfiguration.cycles) { //si es el ultimo
+								__NOP();
 								break;
 
 							} else {
@@ -156,8 +165,8 @@ void loop(void) {
 									Vcell = Vcell + eStep;
 								}
 
-								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
-								MCP4725_SetOutputVoltage(hdac, VDAC);
+								output = Vcell/2.0 + 2.0;
+								MCP4725_SetOutputVoltage(hdac, output);
 
 							} else if (vObjetivo == cvConfiguration.eVertex2){
 
@@ -167,8 +176,8 @@ void loop(void) {
 									Vcell = Vcell + eStep;
 								}
 
-								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
-								MCP4725_SetOutputVoltage(hdac, VDAC);
+								output = Vcell/2.0 + 2.0;
+								MCP4725_SetOutputVoltage(hdac, output);
 
 							} else if (vObjetivo == cvConfiguration.eBegin){
 
@@ -178,8 +187,8 @@ void loop(void) {
 									Vcell = Vcell + eStep;
 								}
 
-								VDAC = 1.65 - (Vcell / 2); // VDAC = 1.65 - VCELL/2
-								MCP4725_SetOutputVoltage(hdac, VDAC);
+								output = Vcell/2.0 + 2.0;
+								MCP4725_SetOutputVoltage(hdac, output);
 
 							}
 						}
@@ -191,6 +200,7 @@ void loop(void) {
 				HAL_TIM_Base_Stop_IT(&htim3);
 				HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
 
+
 				break;
 
 			case START_CA_MEAS:
@@ -198,8 +208,8 @@ void loop(void) {
 				caConfiguration = MASB_COMM_S_getCaConfiguration();
 
 				// Fijar Vcell = eDC
-				VDAC = 1.65 - (caConfiguration.eDC / 2); // VDAC = 1.65 - VCELL/2
-				MCP4725_SetOutputVoltage(hdac, VDAC); // En vez de 0.0f metemos VDAC
+				output = caConfiguration.eDC/2.0 + 2.0;
+				MCP4725_SetOutputVoltage(hdac, output); // En vez de 0.0f metemos VDAC
 
 				//Cerramos el relé
 
@@ -219,18 +229,18 @@ void loop(void) {
 				HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 				ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-				Vadc1 = ADCval_Vcell * 3.3 / 4095; //12 bits, Vref es 3.3V
+				Vadc1 = ((double)ADCval_Vcell) * 3.3 / 4095.0; //12 bits, Vref es 3.3V
 
 				HAL_ADC_Start(&hadc1);
 				HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 				ADCval_Icell = HAL_ADC_GetValue(&hadc1);
 
-				Vadc2 = ADCval_Icell * 3.3 / 4095;
+				Vadc2 = ((double)ADCval_Icell) * 3.3 / 4095.0;
 
 				data.point = i; //Numero de la muestra
 				data.timeMs = time; //tiempo del timer
-				data.voltage = (1.65 - Vadc1) * 2;
-				data.current = (Vadc2 - 1.65) * 2 / 10000; //RTIA de 10kOhms
+				data.voltage = -((Vadc1 * u2b_m) - u2b_b);
+				data.current = ((Vadc2*u2b_m)-u2b_b)/rTia; //RTIA de 10kOhms
 
 				// Enviar datos al host
 				MASB_COMM_S_sendData(data);
@@ -251,19 +261,19 @@ void loop(void) {
 							HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 							ADCval_Vcell = HAL_ADC_GetValue(&hadc1);
 
-							Vadc1 = ADCval_Vcell * 3.3 / 4095; //12 bits, Vref es 3.3V
+							Vadc1 = ((double)ADCval_Vcell) * 3.3 / 4095.0; //12 bits, Vref es 3.3V
 
 							HAL_ADC_Start(&hadc1);
 							HAL_ADC_PollForConversion(&hadc1, 200); //esperamos que finalice la conversion
 							ADCval_Icell = HAL_ADC_GetValue(&hadc1);
 
-							Vadc2 = ADCval_Icell * 3.3 / 4095; //12 bits, Vref es 3.3V
+							Vadc2 = ((double)ADCval_Icell) * 3.3 / 4095.0;
 
 
 							data.point = i; //Numero de la muestra
 							data.timeMs = time; //tiempo del timer
-							data.voltage = (1.65 - Vadc1) * 2;
-							data.current = (Vadc2 - 1.65) * 2 / 10000; //RTIA de 10kOhms
+							data.voltage = -((Vadc1 * u2b_m) - u2b_b);
+							data.current = ((Vadc2*u2b_m)-u2b_b)/rTia; //RTIA de 10kOhms
 
 							// Enviar datos al host
 							MASB_COMM_S_sendData(data);
