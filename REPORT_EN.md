@@ -52,7 +52,7 @@ Cyclic voltammetry (https://en.wikipedia.org/wiki/Cyclic_voltammetry) is an elec
 In order to reproduce this technique, the flow diagram of the designed code is depicted below:
 
 <p align="center">
-<img src="../assets/imgs/cv_flux_diagram.PNG"  alt="Sensor usado en el laboratorio." />
+<img src="Docs/assets/imgs/cv_flux_diagram.PNG"  alt="Sensor usado en el laboratorio." />
 </a>
 </p>
 
@@ -62,7 +62,7 @@ In order to reproduce this technique, the flow diagram of the designed code is d
 Chronoamperometry (https://es.xcv.wiki/wiki/Chronoamperometry) is an electrochemical technique in which a voltage step is applied to the WE electrode and the resulting current is measured in the electrochemical cell as a function of time. One of the main utilities is the detection of the interest analyte’s concentration.
 
 <p align="center">
-<img src="../assets/imgs/ca_flux_diagram.PNG"  alt="Sensor usado en el laboratorio." />
+<img src="Docs/assets/imgs/ca_flux_diagram.PNG"  alt="Sensor usado en el laboratorio." />
 </a>
 </p>
 
@@ -72,13 +72,13 @@ Chronoamperometry (https://es.xcv.wiki/wiki/Chronoamperometry) is an electrochem
 Once the potentiostat has been programmed, the verification of its correct operation is done by means of a potentiometer. To do this, a voltage divider is made with it and the variable terminal is connected to the analog inputs. This configuration is seen below; in addition, its schematic is also added.
 
 <p align="center">
-<img src="../assets/imgs/placa.png"  alt="Configuration of the potentiometer." />
+<img src="Docs/assets/imgs/placa.png"  alt="Configuration of the potentiometer." />
 </a>
 </p>
 
 
 <p align="center">
-<img src="../assets/imgs/circuito.png"  alt="Potentiometer circuit." />
+<img src="Docs/assets/imgs/circuito.png"  alt="Potentiometer circuit." />
 </a>
 </p>
 
@@ -91,7 +91,7 @@ Once this configuration is done, the back-end is connected to the computer. Thro
 First of all, we see the results obtained with the cyclic voltammetry. To do this, we previously set its parameters: 2 cycles are performed between Evertex1 = 0.6V and Evertex2 = -0.6V, starting from Ebegin = 0 V.
 
 <p align="center">
-<img src="../assets/imgs/volta.PNG"  alt="Resultados voltametría cíclica." />
+<img src="Docs/assets/imgs/volta.PNG"  alt="Resultados voltametría cíclica." />
 </a>
 </p>
 
@@ -99,7 +99,7 @@ First of all, we see the results obtained with the cyclic voltammetry. To do thi
 The result of the chronoamperometry is shown below. In this case, the input parameters are Edc = 0.5 V, the sampling frequency and the measurement time. We see how the resulting current in the electrochemical cell is approximately 23 μA.
 
 <p align="center">
-<img src="../assets/imgs/crono.PNG"  alt="Resultados voltametría cíclica." />
+<img src="Docs/assets/imgs/crono.PNG"  alt="Resultados voltametría cíclica." />
 </a>
 </p>
 
@@ -109,12 +109,12 @@ Finally, as it has been introduced previously, the project is validated in the l
 
 
 <p align="center">
-<img src="../assets/imgs/sensor.png"  alt="Sensor used in the lab." />
+<img src="Docs/assets/imgs/sensor.png"  alt="Sensor used in the lab." />
 </a>
 </p>
 
 <p align="center">
-<img src="../assets/imgs/lab.png"  alt=”Potentiometer configuration for the verification." />
+<img src="Docs/assets/imgs/lab.png"  alt=”Potentiometer configuration for the verification." />
 </a>
 </p>
 
@@ -123,13 +123,13 @@ The obtained results are shown below.
 
 
 <p align="center">
-<img src="../assets/imgs/resultado_CA.PNG"  alt="Resultados experimentales voltametría cíclica." />
+<img src="Docs/assets/imgs/resultado_CA.PNG"  alt="Resultados experimentales voltametría cíclica." />
 </a>
 </p>
 
 
 <p align="center">
-<img src="../assets/imgs/CV_results.PNG"  alt="Resultados experimentales voltametría cíclica." />
+<img src="Docs/assets/imgs/CV_results.PNG"  alt="Resultados experimentales voltametría cíclica." />
 </a>
 </p>
 
