@@ -40,7 +40,7 @@ Finally, the  *hotfix* branch contains a correction to make the code run properl
 The flow chart of the designed program is explained in the following flow chart, in which reference is made to cyclic voltammetry and chronoamperometry, which will be detailed later.
 
 <p align="center">
-<img src="../assets/imgs/general_english.PNG"  alt="Diagrama de flujo general" />
+<img src="Docs/assets/imgs/general_english.PNG"  alt="Diagrama de flujo general" />
 </a>
 </p>
 
@@ -105,7 +105,7 @@ The result of the chronoamperometry is shown below. In this case, the input para
 
 
 
-Finally, as it has been introduced previously, the project is validated in the laboratory by making several measurements with a sample of potassium ferricyanide…
+Finally, as it has been presented previously, the project is validated in the laboratory by performing several measurements with a sample of potassium ferricyanide, at two different concentrations, in a potassium chloride buffer; these concentrations are 5 mM and 1 mM. To do so, we have used a sensor like the one we see on the left, where we can observe the CE, WE and RE, from left to right. This sensor is connected to the EVB and the corresponding measurements are obtained.
 
 
 <p align="center">
