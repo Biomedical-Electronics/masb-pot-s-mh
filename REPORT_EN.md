@@ -105,7 +105,7 @@ The result of the chronoamperometry is shown below. In this case, the input para
 
 
 
-Finally, as it has been introduced previously, the project is validated in the laboratory by making several measurements with a sample of potassium ferricyanide…
+Finally, as previously presented, the project is validated in the laboratory by performing several measurements with a sample of potassium ferricyanide at two different concentrations, in a potassium chloride buffer; these concentrations were 5 mM and 1 mM. For this we have used a sensor like the one we see on the first image, where we can observe the CE, WE and RE, from left to right. This sensor is connected to the EVB and the corresponding measurements are obtained.
 
 
 <p align="center">
