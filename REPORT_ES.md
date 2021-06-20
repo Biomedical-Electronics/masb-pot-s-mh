@@ -52,7 +52,7 @@ El diagrama de flujo del programa diseñado se explica en el siguiente diagrama 
 
 ### Voltametría cíclica
 
-La voltametría cíclica (https://en.wikipedia.org/wiki/Cyclic_voltammetry) es una técnica electroquímica en el que se aplica un potencial variable entre los electrodos WE y RE y se van obteniendo medidas de la corriente en la celda electroquímica. Para la variación de este voltaje se hace un barrido triangular, es decir, se establece una tensión objetivo, y se van aplicando pequeños incrementos o decrementos hasta llegar a él. Una vez alcanzado, se cambia la tensión objetivo. El nuevo objetivo dependerá del que hemos venido anteriormente, siendo el orden: eVertex1, eVertex2 y eBegin. Una vez se alcance eBegin, habremos realizado un ciclo. Es necesario que los límites cumplan la condición: eVertex2 < eBegin < eVertex1. Además, para nuestro código en concreto, eVertex2 deberá ser negativo.
+La [voltametría cíclica](https://en.wikipedia.org/wiki/Cyclic_voltammetry) es una técnica electroquímica en el que se aplica un potencial variable entre los electrodos WE y RE y se van obteniendo medidas de la corriente en la celda electroquímica. Para la variación de este voltaje se hace un barrido triangular, es decir, se establece una tensión objetivo, y se van aplicando pequeños incrementos o decrementos hasta llegar a él. Una vez alcanzado, se cambia la tensión objetivo. El nuevo objetivo dependerá del que hemos venido anteriormente, siendo el orden: eVertex1, eVertex2 y eBegin. Una vez se alcance eBegin, habremos realizado un ciclo. Es necesario que los límites cumplan la condición: eVertex2 < eBegin < eVertex1. Además, para nuestro código en concreto, eVertex2 deberá ser negativo.
 
 Por tal de conseguir reproducir esta técnica, se ha diseñado un código que sigue el siguiente diagrama de flujo:
 
@@ -63,7 +63,7 @@ Por tal de conseguir reproducir esta técnica, se ha diseñado un código que si
 
 ### Cronoamperometría
 
-La cronoamperometría (https://es.xcv.wiki/wiki/Chronoamperometry) es una técnica electroquímica en la que se aplica un escalón de voltaje en el electrodo WE y se mide la corriente resultante en la celda electroquímica en función del tiempo. Una de las principales utilidades es la detección de la concentración de un analito de interés.
+La [cronoamperometría](https://es.xcv.wiki/wiki/Chronoamperometry) es una técnica electroquímica en la que se aplica un escalón de voltaje en el electrodo WE y se mide la corriente resultante en la celda electroquímica en función del tiempo. Una de las principales utilidades es la detección de la concentración de un analito de interés.
 
 <p align="center">
 <img src="Docs/assets/imgs/ca_diagrama_flujo.PNG"  alt="Sensor usado en el laboratorio." />
