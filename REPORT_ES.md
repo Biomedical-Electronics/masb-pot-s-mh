@@ -15,8 +15,8 @@ El potenciostato en cuestión consta de un front-end específicamente diseñado 
 - [Diagrama de flujo y explicación de la aplicación](#diagrama-de-flujo-y-explicación-de-la-aplicación)
     - [Voltametría cíclica](#voltametría-cíclica)
     - [Cronoamperometría](#cronoamperometría)
-  - [Resultados-obtenidos](#resultados-obtenidos)
-  - [Conclusiones](#conclusiones)
+- [Resultados-obtenidos](#resultados-obtenidos)
+- [Conclusiones](#conclusiones)
 
 
 ## Objetivos
