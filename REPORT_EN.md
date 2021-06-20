@@ -47,7 +47,7 @@ The flow chart of the designed program is explained in the following flow chart,
 
 ### Cyclic voltammetry
 
-Cyclic voltammetry (https://en.wikipedia.org/wiki/Cyclic_voltammetry) is an electrochemical technique in which a variable potential is applied between the WE and RE electrodes and current measurements from the electrochemical cell are obtained. The variation of this voltage is obtained by doing a triangular sweep. To obtain it, a target voltage is established, and small increments or decrements are applied until reaching it. Once reached, the target voltage is changed. The new objective will depend on the one from which we come, being the order: eVertex1, eVertex2 and eBegin. Once eBegin is reached, we complete a cycle. The limits must meet the condition: eVertex2 <eBegin <eVertex1. Moroever, for our particular code, eVertex2 should be negative.
+[Cyclic voltammetry](https://en.wikipedia.org/wiki/Cyclic_voltammetry) is an electrochemical technique in which a variable potential is applied between the WE and RE electrodes and current measurements from the electrochemical cell are obtained. The variation of this voltage is obtained by doing a triangular sweep. To obtain it, a target voltage is established, and small increments or decrements are applied until reaching it. Once reached, the target voltage is changed. The new objective will depend on the one from which we come, being the order: eVertex1, eVertex2 and eBegin. Once eBegin is reached, we complete a cycle. The limits must meet the condition: eVertex2 <eBegin <eVertex1. Moroever, for our particular code, eVertex2 should be negative.
 
 In order to reproduce this technique, the flow diagram of the designed code is depicted below:
 
@@ -59,7 +59,7 @@ In order to reproduce this technique, the flow diagram of the designed code is d
 
 ### Chronoamperometry
 
-Chronoamperometry (https://es.xcv.wiki/wiki/Chronoamperometry) is an electrochemical technique in which a voltage step is applied to the WE electrode and the resulting current is measured in the electrochemical cell as a function of time. One of the main utilities is the detection of the interest analyte’s concentration.
+[Chronoamperometry](https://es.xcv.wiki/wiki/Chronoamperometry) is an electrochemical technique in which a voltage step is applied to the WE electrode and the resulting current is measured in the electrochemical cell as a function of time. One of the main utilities is the detection of the interest analyte’s concentration.
 
 <p align="center">
 <img src="Docs/assets/imgs/ca_flux_diagram.PNG"  alt="Sensor usado en el laboratorio." />
@@ -105,7 +105,7 @@ The result of the chronoamperometry is shown below. In this case, the input para
 
 
 
-Finally, as it has been presented previously, the project is validated in the laboratory by performing several measurements with a sample of potassium ferricyanide, at two different concentrations, in a potassium chloride buffer; these concentrations are 5 mM and 1 mM. To do so, we have used a sensor like the one we see on the left, where we can observe the CE, WE and RE, from left to right. This sensor is connected to the EVB and the corresponding measurements are obtained.
+Finally, as it has been introduced previously, the project is validated in the laboratory by making several measurements with a sample of potassium ferricyanide…
 
 
 <p align="center">
