@@ -14,8 +14,8 @@ The potentiostat consists of a front-end specifically designed for this project,
 - [Flow chart and explanation of the application](#flow-chart-and-explanation-of-the-application)
     - [Cyclic voltammetry](#Cyclic-voltammetry)
     - [Chronoamperometry](#chronoamperometry)
-  - [Results](#results)
-  - [Conclusions](#conclusions)
+- [Results](#results)
+- [Conclusions](#conclusions)
 
 ## Objectives
 
