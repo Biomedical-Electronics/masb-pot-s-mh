@@ -15,8 +15,8 @@ El potenciostato en cuestión consta de un front-end específicamente diseñado 
 - [Diagrama de flujo y explicación de la aplicación](#diagrama-de-flujo-y-explicación-de-la-aplicación)
     - [Voltametría cíclica](#voltametría-cíclica)
     - [Cronoamperometría](#cronoamperometría)
-- [Resultados-obtenidos](#resultados-obtenidos)
-- [Conclusiones](#conclusiones)
+  - [Resultados-obtenidos](#resultados-obtenidos)
+  - [Conclusiones](#conclusiones)
 
 
 ## Objetivos
@@ -43,9 +43,11 @@ El diagrama de flujo del programa diseñado se explica en el siguiente diagrama 
 
 
 <p align="center">
-<img src="../assets/imgs/general.PNG"  alt="Diagrama de flujo general" />
+<img src="Docs/assets/imgs/general.PNG"  alt="Diagrama de flujo general" />
 </a>
 </p>
+
+
 
 
 ### Voltametría cíclica
@@ -55,7 +57,7 @@ La voltametría cíclica (https://en.wikipedia.org/wiki/Cyclic_voltammetry) es u
 Por tal de conseguir reproducir esta técnica, se ha diseñado un código que sigue el siguiente diagrama de flujo:
 
 <p align="center">
-<img src="../assets/imgs/cv_diagrama_flujo.PNG"  alt="Sensor usado en el laboratorio." />
+<img src="Docs/assets/imgs/cv_diagrama_flujo.PNG"  alt="Sensor usado en el laboratorio." />
 </a>
 </p>
 
@@ -64,7 +66,7 @@ Por tal de conseguir reproducir esta técnica, se ha diseñado un código que si
 La cronoamperometría (https://es.xcv.wiki/wiki/Chronoamperometry) es una técnica electroquímica en la que se aplica un escalón de voltaje en el electrodo WE y se mide la corriente resultante en la celda electroquímica en función del tiempo. Una de las principales utilidades es la detección de la concentración de un analito de interés.
 
 <p align="center">
-<img src="../assets/imgs/ca_diagrama_flujo.PNG"  alt="Sensor usado en el laboratorio." />
+<img src="Docs/assets/imgs/ca_diagrama_flujo.PNG"  alt="Sensor usado en el laboratorio." />
 </a>
 </p>
 
@@ -73,13 +75,13 @@ La cronoamperometría (https://es.xcv.wiki/wiki/Chronoamperometry) es una técni
 Una vez programado el potenciostato, la comprobación de su correcto funcionamiento se hace mediante un potenciómetro. Para ello, se hace un divisor de tensión con él y el terminal variable se conecta a las entradas analógicas. Esta configuración se observa a continuación; además, también se añade su esquemático.
 
 <p align="center">
-<img src="../assets/imgs/placa.png"  alt="Configuración potenciómetro." />
+<img src="Docs/assets/imgs/placa.png"  alt="Configuración potenciómetro." />
 </a>
 </p>
 
 
 <p align="center">
-<img src="../assets/imgs/circuito.png"  alt="Circuito potenciómetro." />
+<img src="Docs/assets/imgs/circuito.png"  alt="Circuito potenciómetro." />
 </a>
 </p>
 
@@ -89,7 +91,7 @@ Una vez realizada esta configuración, se conecta el back-end al ordenador. A tr
 En primer lugar vemos los resultados obtenidos para la voltametría cíclica. Para ello, establecemos previamente sus parámetros: se realizarán 2 ciclos entre Evertex1= 0.6V y Evertex2= -0.6V, empezando desde Ebegin = 0 V. 
 
 <p align="center">
-<img src="../assets/imgs/volta.PNG"  alt="Resultados voltametría cíclica." />
+<img src="Docs/assets/imgs/volta.PNG"  alt="Resultados voltametría cíclica." />
 </a>
 </p>
 
@@ -99,7 +101,7 @@ En primer lugar vemos los resultados obtenidos para la voltametría cíclica. Pa
 A continuación, se muestra el resultado de la cronoamperometría. En este caso, los parámetros de entrada son Edc = 0.5 V, la frecuencia de muestreo y el tiempo de medida. Vemos como la corriente resultante en la celda electroquímica es de 23 μA, aproximadamente.
 
 <p align="center">
-<img src="../assets/imgs/crono.PNG "  alt="Resultados cronoamperometría." />
+<img src="Docs/assets/imgs/crono.PNG "  alt="Resultados cronoamperometría." />
 </a>
 </p>
 
@@ -108,12 +110,12 @@ A continuación, se muestra el resultado de la cronoamperometría. En este caso,
 Por último, como se ha introducido anteriormente, el proyecto realizado se valida en el laboratorio haciendo varias mediciones con una muestra de ferricianuro de potasio a dos concentraciones diferentes, en un tampón de cloruro de potasio; estas concentraciones eran 5 mM y 1mM. Para ello hemos usado un sensor como el que vemos en la izquierda, donde podemos observar el CE, el WE y el RE, de izquierda a derecha. Este sensor se conecta a la EVB y se obtienen las mediciones correspondientes.
 
 <p align="center">
-<img src="../assets/imgs/sensor.png"  alt="Sensor usado en el laboratorio." />
+<img src="Docs/assets/imgs/sensor.png"  alt="Sensor usado en el laboratorio." />
 </a>
 </p>
 
 <p align="center">
-<img src="../assets/imgs/lab.png"  alt=”Montaje potenciostato en el laboratorio." />
+<img src="Docs/assets/imgs/lab.png"  alt="Montaje potenciostato en el laboratorio." />
 </a>
 </p>
 
@@ -121,13 +123,13 @@ Por último, como se ha introducido anteriormente, el proyecto realizado se vali
 Los resultados obtenidos se han exportado a excel, y se muestran a continuación.
 
 <p align="center">
-<img src="../assets/imgs/resultado_CA.PNG"  alt="Resultados experimentales voltametría cíclica." />
+<img src="Docs/assets/imgs/resultado_CA.PNG"  alt="Resultados experimentales voltametría cíclica." />
 </a>
 </p>
 
 
 <p align="center">
-<img src="../assets/imgs/CV_results.PNG"  alt="Resultados experimentales voltametría cíclica." />
+<img src="Docs/assets/imgs/CV_results.PNG"  alt="Resultados experimentales voltametría cíclica." />
 </a>
 </p>
 
