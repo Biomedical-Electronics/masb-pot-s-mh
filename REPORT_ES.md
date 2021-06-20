@@ -107,7 +107,7 @@ A continuación, se muestra el resultado de la cronoamperometría. En este caso,
 
 
 
-Por último, como se ha introducido anteriormente, el proyecto realizado se valida en el laboratorio haciendo varias mediciones con una muestra de ferricianuro de potasio a dos concentraciones diferentes, en un tampón de cloruro de potasio; estas concentraciones eran 5 mM y 1mM. Para ello hemos usado un sensor como el que vemos en la izquierda, donde podemos observar el CE, el WE y el RE, de izquierda a derecha. Este sensor se conecta a la EVB y se obtienen las mediciones correspondientes.
+Por último, como se ha introducido anteriormente, el proyecto realizado se valida en el laboratorio haciendo varias mediciones con una muestra de ferricianuro de potasio a dos concentraciones diferentes, en un tampón de cloruro de potasio; estas concentraciones eran 5 mM y 1mM. Para ello hemos usado un sensor como el que vemos en la priemra foto, donde podemos observar el CE, el WE y el RE, de izquierda a derecha. Este sensor se conecta a la EVB y se obtienen las mediciones correspondientes.
 
 <p align="center">
 <img src="Docs/assets/imgs/sensor.png"  alt="Sensor usado en el laboratorio." />
