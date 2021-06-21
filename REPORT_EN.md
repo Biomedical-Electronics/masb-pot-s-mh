@@ -20,11 +20,17 @@ The potentiostat consists of a front-end specifically designed for this project,
 ## Objectives
 
 The objectives to accomplish during the development of this project are detailed below:
+
 Programming a portable potentiostat.
+
 Control of the Power Management Unit (PMU) of the potentiostat’s front-end.
+
 Communication with the viSens-S application, which is installed with a computer, using the MASB-COMM-S protocol.
+
 Carrying out a cyclic voltammetry.
+
 Carrying out a cyclic chronoamperometry.
+
 Validation of the results by doing measurements with potassium ferricyanide in a potassium chloride buffer.
 
 ## Flow chart and explanation of the application
